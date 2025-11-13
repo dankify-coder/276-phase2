@@ -1,0 +1,44 @@
+[project]
+name = "cmpt276_group5_countrygame"
+version = "0.0.1"
+authors = [
+  { name="Isaac Liu", email="itl3@sfu.ca" },
+  { name="Sam McGarry", email="sma256@sfu.ca" },
+  { name="Jun Yi Fan", email="jyf5@sfu.ca" },
+  { name="Ben Samy", email="bsa125@sfu.ca" },
+  { name="Ravneet Kaur", email="" },
+]
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "countryinfo>=1.0.0",
+    "pytest-cov>=7.0.0",
+    "pytest-asyncio>=1.2.0",
+    "ruff>=0.14.4"
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=0.13.2",
+]
+
+
+[tool.coverage.run]
+source = [
+    "./src"
+]
+
+omit = [
+    "./test"
+]
+
+[pytest]
+pythonpath = src
+filterwarnings = ignore:::vbuild
