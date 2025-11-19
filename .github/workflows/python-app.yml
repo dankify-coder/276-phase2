@@ -50,6 +50,9 @@ jobs:
   coverage:
     name: Test Coverage
     needs: test
+    permissions:
+      pull-requests: write
+      attestations: write
     runs-on: ubuntu-latest
     steps:
       - name: Download coverage results
