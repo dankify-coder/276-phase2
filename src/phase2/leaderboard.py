@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import Float, Integer, Sequence, select
-from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column, select, update
 
 Base = declarative_base()
 
@@ -14,11 +15,16 @@ class LeaderboardEntry(Base):
     daily_streak: Mapped[int] = mapped_column(
         Integer, default=0)  # current streak of dailies completed
     longest_daily_streak:  Mapped[int] = mapped_column(
-        Integer)  # highest daily streak ever recorded
-    average_daily_guesses:  Mapped[int] = mapped_column(Integer)
+        Integer, default =0)  # highest daily streak ever recorded
+    average_daily_guesses:  Mapped[int] = mapped_column(
+        Integer, default=0)
     average_daily_time: Mapped[float] = mapped_column(
-        Float)  # average time to complete the daily in seconds
-    longest_survival_streak: Mapped[int] = mapped_column(Integer)
+        Float, default=0)  # average time to complete the daily in seconds
+    longest_survival_streak: Mapped[int] = mapped_column(
+        Integer, default=0)
+    high_score: Mapped[int] = mapped_column(
+        Integer, nullable=False)
+    
 
 
 class Leaderboard:
@@ -26,12 +32,40 @@ class Leaderboard:
     def __init__(self, session: Session):
         self.session = session
 
-    async def create_user_entry(self, user_id: int):
+    async def create_user_entry(self, user_id: int, score: int):
         """
         Creates a new LeaderboardEntry for the given user,
         if one doesn't already exit
         """
-        pass
+        entry = self.session.execute(
+            select(LeaderboardEntry)
+            .where(LeaderboardEntry.user_id == user_id)
+        ).scalars().first()
+
+        if entry is None:
+            entry = LeaderboardEntry(
+                user_id=user_id,
+                daily_streak=0,
+                longest_daily_streak=0,
+                average_daily_guesses=0,
+                average_daily_time=0.0,
+                longest_survival_streak=0,
+                high_score=score,
+            )
+            self.session.add(entry)
+        elif(score > entry.high_score): #Update highscore if score is greater
+            entry.high_score = score
+        
+
+        try:
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+            return None
+        
+        return entry
+    
+
 
     async def update_user_entry(self, user_id: int):
         """
@@ -70,6 +104,13 @@ class Leaderboard:
         """
         pass
 
+    async def get_score(self, user_id: int) -> int:
+        """
+        calculates user score
+        """
+        return 100
+
+ 
 class LeaderboardEntrySchema(BaseModel):
     id: int
     user_id: int
