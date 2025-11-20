@@ -10,15 +10,6 @@ from phase2.round import GuessFeedback, RoundStats
 # NiceGUI elements go here
 
 # display the game (guess input, guess feedback, timer, # of guesses, etc.)
-"""
-game
-
-    - guess entry box
-    - guess button
-    - guess feedback
-
-    - win/loss popup
-"""
 
 
 def concat_data(feedback, data) -> str:
@@ -73,9 +64,6 @@ def content():
         if it's valid.
         """
         if guess_input.validate():
-            if not round_stats.start_time:
-                round_stats.start_round()
-
             handle_guess(guess_input.value, round_stats)
             guess_input.value = ""
 
@@ -108,13 +96,15 @@ def content():
                 # Create a card with the given style and the attribute formatted cleanly
                 with ui.card(align_items="center").classes(classes):
                     if arrow_style:
-                        ui.element("div").classes("absolute inset-0 bg-black/40").style(arrow_style)
+                        ui.element("div").classes("absolute inset-0 bg-black/40").style(
+                            arrow_style
+                        ).mark("arrow")
 
                     attr_content = getattr(country, attr)
                     text = str(attr_content)
                     with ui.scroll_area().classes("r-scroll-area-centered"):
                         if attr == "name":
-                            text = attr_content.capitalize()
+                            text = attr_content.title()
                         elif attr == "population":
                             text = format(attr_content, ",")
                         elif attr == "size":
@@ -152,7 +142,9 @@ def content():
 
         with ui.dialog() as dialog, ui.card():
             ui.label(text)
-            ui.label("The correct country was " + get_daily_country().name)
+            ui.label("The correct country was " + get_daily_country().name.title()).mark(
+                "country_confirm"
+            )
             ui.label(f"Time: {str(round_stats.round_length).split('.')[0]}")
             ui.label(f"Guesses: {round_stats.guesses}")
             ui.button("Close", on_click=dialog.close)

@@ -1,8 +1,11 @@
+import logging
 import random
 from datetime import date
 
 from phase2.country import Country, get_country, get_random_country
 from phase2.round import GuessFeedback, RoundStats
+
+logger = logging.getLogger("phase2.daily")
 
 
 def get_daily_country() -> Country:
@@ -24,8 +27,11 @@ def handle_guess(input: str, round_stats: RoundStats):
     country = get_country(input)
     daily_country = get_daily_country()
 
-    # Error handling in case the countryinfo API isn't able to serve
-    # info we need
+    # Start the round if it isn't started already
+    if not round_stats.start_time:
+        round_stats.start_round()
+
+    # Error handling in case the countryinfo API isn't able to serve info we need
     try:
         feedback: GuessFeedback = compare_countries(country, daily_country)
     except AttributeError:
