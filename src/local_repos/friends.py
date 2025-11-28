@@ -10,7 +10,8 @@ class LocalFriendRequest:
     requestee_id: int
     status: str = "pending"
 
-
+# revolves around friend requests
+# doesnt actually store friends, just lists friend requests that have been accepted
 class LocalFriendsRepo:
     def __init__(self, user_repo):
         self.user_repo = user_repo
@@ -43,6 +44,13 @@ class LocalFriendsRepo:
         fr = next((r for r in self.requests if r.id == request_id), None)
         if fr:
             fr.status = "accepted"
+
+    async def reject_request(self, request_id: int) -> bool:
+        fr = next((r for r in self.requests if r.id == request_id), None)
+        if fr and fr.status == "pending":
+            self.requests.remove(fr)
+            return True
+        return False
 
     async def get_requests(self, user_id: int):
         return [r for r in self.requests if r.requestee_id == user_id and r.status == "pending"]
