@@ -7,6 +7,7 @@ from nicegui.events import KeyEventArguments
 from game import game_ui
 from game.daily import get_daily_country
 from game.leaderboard_ui import leaderboard_page
+from game.analytics_ui import session_analytics_page
 from local_repos.auth import LocalAuthRepo
 from local_repos.friends import LocalFriendsRepo
 from local_repos.stats import LocalStatisticsRepo
@@ -86,6 +87,10 @@ def index_page():
 @ui.page("/leaderboard")
 def _():
     leaderboard_page()
+
+@ui.page("/session-analytics")
+def _():
+    session_analytics_page()
 
 
 ui.run(title="CMPT276 Project", dark=None)
